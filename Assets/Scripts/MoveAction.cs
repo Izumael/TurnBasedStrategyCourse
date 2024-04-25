@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class MoveAction : MonoBehaviour
@@ -35,26 +36,51 @@ public class MoveAction : MonoBehaviour
         }
     }
 
-    public void Move(Vector3 targetPosition)
+    //public void Move(Vector3 targetPosition)
+    //{
+    //    this.targetPosition = targetPosition;
+    //}
+
+    public void Move(GridPosition gridPosition)
     {
-        this.targetPosition = targetPosition;
+        this.targetPosition = LevelGrid.Instance.GetWorldPosition(gridPosition);
+        //Debug.Log(targetPosition);
+    }
+
+    public bool IsValidGridPosition(GridPosition gridPosition)
+    {
+        List<GridPosition> validGridPosition = GetValidActionGridPositionList();
+        return validGridPosition.Contains(gridPosition);
     }
 
     public List<GridPosition> GetValidActionGridPositionList()
     {
         GridPosition unitGridPosition= unit.GetGridPosition();
-        List<GridPosition > gridPositionsList = new List<GridPosition>();
+        List<GridPosition > validGridPositionsList = new List<GridPosition>();
         for (int x = -maxMoveDistance; x <= maxMoveDistance; x++)
         {
             for (int z = -maxMoveDistance; z <= maxMoveDistance; z++)
             {
                 GridPosition offsetGridPosition = new GridPosition(x, z);
                 GridPosition testGridPosition = unitGridPosition + offsetGridPosition;
-                Debug.Log(testGridPosition);
+                if (!LevelGrid.Instance.IsValidGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+                if (unitGridPosition == testGridPosition)
+                {
+                    continue;
+                }
+                if (LevelGrid.Instance.HasAnyUnitOnGridPosition(testGridPosition))
+                {
+                    continue;
+                }
+
+                validGridPositionsList.Add(testGridPosition);
             }
         }
 
-        return gridPositionsList;
+        return validGridPositionsList;
     }
 
 }
