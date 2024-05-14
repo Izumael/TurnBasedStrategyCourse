@@ -6,7 +6,8 @@ using UnityEngine;
 public class TurnSystem : MonoBehaviour
 {
     private int turnNumber = 1;
-    public event EventHandler OnTurnChange;
+    private bool isPlayerTurn = true;
+    public event EventHandler OnTurnChanged;
     public static TurnSystem Instance { get; private set; }
 
     private void Awake()
@@ -23,12 +24,18 @@ public class TurnSystem : MonoBehaviour
     public void NextTurn()
     {
         turnNumber++;
+        isPlayerTurn = !isPlayerTurn;
 
-        OnTurnChange?.Invoke(this, EventArgs.Empty);
+        OnTurnChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public int GetTurnNumber()
     {
         return turnNumber;
+    }
+
+    public bool IsPlayerTurn()
+    {
+        return isPlayerTurn;
     }
 }
